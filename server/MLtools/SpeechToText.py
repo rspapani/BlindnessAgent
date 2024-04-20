@@ -1,23 +1,12 @@
-import requests
-import os
+from HuggingWrapper import get_query
 
-from dotenv import load_dotenv
-load_dotenv()
-
-hugging_key = os.getenv("HUGGING_KEY")
 API_URL = "https://api-inference.huggingface.co/models/openai/whisper-large-v3"
 
 headers = {
-    "Accept": "application/json",
-    "Authorization": f"Bearer {hugging_key}", 
     "Content-Type": "audio/flac"  
 }
 
-def whisper_query(filename):
-    with open(filename, "rb") as f:
-        data = f.read()
-    response = requests.post(API_URL, headers=headers, data=data)
-    return response.json()
+speech_query = get_query(API_URL=API_URL, cust_headers=headers)
 
 if __name__ == "__main__":
-    print(whisper_query("../refaudio/TEDtalk.flac"))
+    print(speech_query(filename="../refaudio/Rantman.flac"))
