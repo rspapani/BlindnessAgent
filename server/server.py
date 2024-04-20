@@ -21,7 +21,7 @@ def upload_image():
 
         analysis = analyze_b64img_with_gpt4(image_base64)
 
-        return jsonify({f'message': {analysis}}), 200
+        return jsonify({'message': analysis}), 200
     else:
         return jsonify({'error': 'No image_base64 field in the request body'}), 400
 
