@@ -7,11 +7,10 @@ import os
 def encode_image_to_base64(image_path):
     with open(image_path, "rb") as image_file:
         return base64.b64encode(image_file.read()).decode('utf-8')
-
-def analyze_image_with_gpt4(image_path):
+    
+def analyze_b64img_with_gpt4(base64_image):
     client = OpenAI(api_key=os.environ.get("OPEN_AI_KEY"))
 
-    base64_image = encode_image_to_base64(image_path)
     image_data = f"data:image/jpeg;base64,{base64_image}"
 
     response = client.chat.completions.create(
@@ -19,14 +18,14 @@ def analyze_image_with_gpt4(image_path):
         messages=[
             {
                 "role": "system",
-                "content": "You are a highly capable AI trained to analyze images."
+                "content": "You are a helpful, highly trained, AI vision assistant tasked with aiding those with vision impairments by describing their environment and answering any questions that they may have about it."
             },
             {
             "role": "user",
             "content": [
                 {
                 "type": "text",
-                "text": "What’s in this image?"
+                "text": "Please tell me what I am looking at, provided here is an image of what is directly in front of me"
                 },
                 {
                 "type": "image_url",
@@ -39,6 +38,9 @@ def analyze_image_with_gpt4(image_path):
         ])
 
     return response.choices[0].message.content if response.choices else "No response."
+
+def analyze_image_with_gpt4(image_path):
+    return analyze_b64img_with_gpt4(encode_image_to_base64(image_path))
 
 if __name__ == "__main__":
     print(analyze_image_with_gpt4('../refimages/drinks.jpg'))
