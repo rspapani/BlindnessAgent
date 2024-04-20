@@ -9,4 +9,4 @@ headers = {
 speech_query = get_query(API_URL=API_URL, cust_headers=headers)
 
 if __name__ == "__main__":
-    print(speech_query(filename="../refaudio/Rantman.flac"))
+    print(speech_query(filename="../refaudio/noisy2.ogg"))
