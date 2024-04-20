@@ -1,6 +1,10 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import re
+
+from MLtools.AgentBlind import analyze_b64img_with_gpt4
+
+
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})  # Allow requests from any origin
 
@@ -14,7 +18,10 @@ def upload_image():
         image_base64 = re.search(r'base64,(.*)', image_base64).group(1)
         image_encodings.append(image_base64)
         print(image_encodings)
-        return jsonify({'message': 'Image uploaded successfully'}), 200
+
+        analysis = analyze_b64img_with_gpt4(image_base64)
+
+        return jsonify({f'message': {analysis}}), 200
     else:
         return jsonify({'error': 'No image_base64 field in the request body'}), 400
 
