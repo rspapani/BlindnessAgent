@@ -20,7 +20,7 @@ def upload_image():
         print(image_encodings)
 
         analysis = analyze_b64img_with_gpt4(image_base64)
-
+        print(analysis)
         return jsonify({'message': analysis}), 200
     else:
         return jsonify({'error': 'No image_base64 field in the request body'}), 400

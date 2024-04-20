@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Webcam Capture</title>
+</head>
+<body>
+<video id="videoElement" width="640" height="480" autoplay></video>
+<button id="captureButton">Capture</button>
+<canvas id="canvas" style="display:none;"></canvas>
+<button id="recordButton">Record</button>
+<button id="playPauseButton">Pause</button>
+<audio id="audioPlayer" controls></audio>
+<video id="hiddenVideo" width="1" height="1" style="display: none;"></video> <!-- Hidden video element -->
+<div id="downloadLinks"></div>
+
+<script>
+ let mediaRecorder;
+ let chunks = [];
+
+  // Check for media devices
+  navigator.mediaDevices.getUserMedia({ audio: true })
+    .then(function(stream) {
+      // Assign the media stream to the media recorder
+      mediaRecorder = new MediaRecorder(stream);
+
+      // Event listener for when data is available
+      mediaRecorder.ondataavailable = function(e) {
+        chunks.push(e.data);
+      };
+
+      // Event listener for when recording stops
+      mediaRecorder.onstop = function() {
+        // Combine the recorded chunks into a single Blob
+        let blob = new Blob(chunks, { type: 'audio/mpeg' });
+
+        // Reset chunks
+        chunks = [];
+
+        // Create a URL for the Blob
+        let audioURL = URL.createObjectURL(blob);
+        console.log(audioURL)
+
+        // Set the audio element's src to the recorded audio
+        document.getElementById('audioPlayer').src = audioURL;
+        const mp3Link = document.createElement('a');
+        mp3Link.href = audioURL;
+        mp3Link.download = 'recorded_audio.mp3';
+        mp3Link.textContent = 'Download MP3';
+
+      // Append the download link to the DOM
+        const downloadLinks = document.getElementById('downloadLinks');
+        downloadLinks.appendChild(mp3Link);
+        fetch('http://localhost:5000/upload_audio', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ audio_url: audioURL }),
+})
+  .then(response => {
+    if (response.ok) {
+      console.log('Audio uploaded successfully');
+    } else {
+      console.error('Failed to upload image');
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
+        
+      };
+    })
+    .catch(function(err) {
+      console.error('Error accessing media devices.', err);
+    });
+
+  // Event listener for record button click
+  document.getElementById('recordButton').addEventListener('click', function() {
+    if (mediaRecorder.state === 'inactive') {
+      mediaRecorder.start();
+      console.log('Recording started.');
+    } else {
+      mediaRecorder.stop();
+      console.log('Recording stopped.');
+    }
+  });
+
+  // Event listener for play/pause button click
+  let audioPlayer = document.getElementById('audioPlayer');
+  let playPauseButton = document.getElementById('playPauseButton');
+  playPauseButton.addEventListener('click', function() {
+    if (audioPlayer.paused) {
+      audioPlayer.play();
+    } else {
+      audioPlayer.pause();
+    }
+  });
+
+// Event listener for media session play event
+navigator.mediaSession.setActionHandler('play', function() {
+  if (audioPlayer.paused) {
+    audioPlayer.play();
+  }
+});
+
+// Event listener for media session pause event
+navigator.mediaSession.setActionHandler('pause', function() {
+  if (!audioPlayer.paused) {
+    audioPlayer.pause();
+  }
+});
+
+// Access the webcam
+navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }) // Try to use an external webcam if available
+  .then(function(stream) {
+    var video = document.getElementById('videoElement');
+    video.srcObject = stream;
+    video.onloadedmetadata = function(e) {
+      video.play();
+    };
+  })
+  .catch(function(err) {
+    console.log("Failed to access external webcam, falling back to default webcam.");
+    // Access the default webcam if the external one is not available
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(function(stream) {
+        var video = document.getElementById('videoElement');
+        video.srcObject = stream;
+        video.onloadedmetadata = function(e) {
+          video.play();
+        };
+      })
+      .catch(function(err) {
+        console.log("An error occurred: " + err);
+      });
+  });
+
+// Capture button click event
+document.getElementById('captureButton').addEventListener('click', function() {
+  var video = document.getElementById('videoElement');
+  var canvas = document.getElementById('canvas');
+  var context = canvas.getContext('2d');
+
+  // Set canvas dimensions to match video dimensions
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+
+  // Draw the current frame from the video onto the canvas
+  context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+  // Convert the canvas content to a data URL representing a PNG image
+  var dataURL = canvas.toDataURL('image/png');
+  console.log(dataURL)
+
+  // Create a link element to download the captured image
+  var link = document.createElement('a');
+  link.download = 'webcam_capture.png';
+  link.href = dataURL;
+  link.click();
+  
+  fetch('http://localhost:5000/upload_image', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ image_base64: dataURL }),
+})
+  .then(response => {
+    if (response.ok) {
+      console.log('Image uploaded successfully');
+    } else {
+      console.error('Failed to upload image');
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
+});
+
+// Event listener for hidden video play event
+document.getElementById('hiddenVideo').addEventListener('play', function() {
+  if (mediaRecorder.state === 'inactive') {
+    mediaRecorder.start();
+    console.log('Recording started.');
+  }
+});
+
+// Event listener for hidden video pause event
+document.getElementById('hiddenVideo').addEventListener('pause', function() {
+  if (mediaRecorder.state === 'recording') {
+    mediaRecorder.stop();
+    console.log('Recording stopped.');
+  }
+});
+
+</script>
+
+
+</body>
+</html>
