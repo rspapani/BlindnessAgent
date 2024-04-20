@@ -1,7 +1,10 @@
 import requests
 import os
 
-hugging_key = os.environ.get("HUGGING_KEY")
+from dotenv import load_dotenv
+load_dotenv()
+
+hugging_key = os.getenv("HUGGING_KEY")
 API_URL = "https://api-inference.huggingface.co/models/openai/whisper-large-v3"
 
 headers = {

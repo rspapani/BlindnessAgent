@@ -4,12 +4,16 @@ from openai import OpenAI
 import base64
 import os
 
+from dotenv import load_dotenv
+load_dotenv()
+
+
 def encode_image_to_base64(image_path):
     with open(image_path, "rb") as image_file:
         return base64.b64encode(image_file.read()).decode('utf-8')
     
 def analyze_b64img_with_gpt4(base64_image):
-    client = OpenAI(api_key=os.environ.get("OPEN_AI_KEY"))
+    client = OpenAI(api_key=os.getenv("OPEN_AI_KEY"))
 
     image_data = f"data:image/jpeg;base64,{base64_image}"
 
