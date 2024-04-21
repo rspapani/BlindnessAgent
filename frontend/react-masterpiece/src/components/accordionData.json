@@ -1,0 +1,19 @@
+data = {
+    "Button 1": [
+        ["person1", "response"],
+        ["person2", "response"]
+    ],
+    "Button 2": [
+        ["person1", "response"],
+        ["person2", "response"]
+    ],
+    "Button 3": [
+        ["person1", "response"],
+        ["person2", "response"]
+    ],
+    "Button 4": [
+        ["person1", "response"],
+        ["person2", "response"]
+    ]
+};
+

@@ -1,0 +1,66 @@
+.heroHeader {
+    height: 200px;
+    max-height: 200px;
+    min-height: 50px;
+    background: url('https://d4z6dx8qrln4r.cloudfront.net/background-572f59cc9d0d8-default.jpeg') no-repeat center;
+    background-size: cover;
+    left: 0;
+    right: 0;
+    position: fixed;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    &-content {
+      position: relative;
+      z-index: 1;
+    }
+    &::before {
+      content: "";
+      background: rgba(#000, 0.45);
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      transition: background 400ms;
+      z-index: 0;
+    }
+  }
+  
+  /* Just decorating stuff, nothing interesting to see here */
+  @import 'https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600';
+  
+  body,
+  html {
+    font-family: 'Source Sans Pro', sans-serif;
+    margin: 0;
+    padding: 0;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  h1 {
+    margin: 0;
+    padding: 0;
+  }
+  
+  p {
+    margin: 0;
+    padding: 0 0 25px 0;
+  }
+  
+  .title {
+    color: #fff;
+    text-align: center;
+    font-size: 40px;
+    font-weight: 600;
+  }
+  
+  section {
+    width: 600px;
+    max-width: 100%;
+    padding: 225px 20px 20px 20px;
+    margin: 0 auto;
+    display: block;
+    line-height: 150%;
+  }
