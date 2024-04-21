@@ -15,6 +15,9 @@ import numpy as np
 
 from pydub import AudioSegment
 
+
+endfile="MLtools/end.wav"
+
 def delete_folder(folder_path):
     # Check if the folder exists
     if os.path.exists(folder_path):
@@ -119,7 +122,7 @@ def split_audio_segment(input_file, speaker,start_time, end_time,output_file=Non
 
 
 # locfile='in.wav'
-endfile="end.wav"
+
 def makeuberfiles(speaker):
     files=glob.glob(f"{output_folder}/audio_{speaker}_*")
     combined = AudioSegment.silent(duration=0)
@@ -177,8 +180,17 @@ def read_audio_with_pydub(file_path):
     audio_bytes = bytes(audio.raw_data)
     return audio_bytes
 
-def diarize(locfile):
+def diarize(locfileraw):
     try:
+        locfile = "diarizationer.wav"
+        
+        def convert_webm_to_wav(input_file, output_file):
+            # Command to convert webm to wav using ffmpeg
+            command = ['ffmpeg', '-i', input_file, '-vn', '-acodec', 'pcm_s16le', '-ar', '44100', '-ac', '2',"-y", output_file]
+            # Execute the command
+            subprocess.run(command, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+
+        convert_webm_to_wav(locfileraw, locfile)
 
         # STEP 1: Create a Deepgram client using the API key
         deepgram = DeepgramClient(API_KEY)
@@ -343,4 +355,4 @@ def diarize(locfile):
     return fulltranscript[0:-1]
 
 if __name__ == "__main__":
-    print(diarize("restarded.mp3"))
+    print(diarize("../tempnew.webm"))

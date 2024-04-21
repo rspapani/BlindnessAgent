@@ -12,7 +12,9 @@ CORS(app, resources={r"/*": {"origins": "*"}})  # Allow requests from any origin
 
 FILE_DIRECTORY="./feedback_audio"
 
-machine = ConvoCoach()
+machine = ConvoCoach()   
+
+
 image_encodings = []
 @app.route('/upload_image', methods=['POST'])
 def upload_image():
@@ -47,7 +49,7 @@ def upload_audio():
         with open("tempnew.webm", "rb") as audio_file:
             audio_data = audio_file.read()
 
-        deedback = machine.add_clip(audio_data, 0)
+        deedback = machine.add_clip(audio_data, 0, "tempnew.webm")
 
         print(deedback)
 
@@ -60,6 +62,19 @@ def upload_audio():
 @app.route('/dummy_endpoint', methods=['GET'])
 def dummy_endpoint():
     return jsonify({'message': 'This is a dummy endpoint'}), 200
+
+@app.route('/get_highlights', methods=['GET'])
+def get_data():
+    # with open("tempnew.webm", "rb") as audio_file:
+    #     audio_data = audio_file.read()
+
+    # deedback = machine.add_clip(audio_data, 0, "tempnew.webm")
+    # print(deedback)
+    # deedback = machine.add_clip(audio_data, 2, "temp.webm")
+    # print(deedback)
+    # print(machine.get_highlights())
+
+    return jsonify(machine.get_highlights())
 
 @app.route('/audio_feedback/<filename>')
 def read_file(filename):

@@ -58,6 +58,5 @@ if __name__ == "__main__":
 
     x = time.time()
     print(os.listdir())
-    print(sentiment_analysis(filename="restarted.mp3"))
-    print(time.time() - x)
+    print(sentiment_analysis(filename="./extracted_audio/TotalFileSpeaker_0.wav"))
 

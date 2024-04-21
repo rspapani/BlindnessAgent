@@ -14,6 +14,8 @@ from MLtools.CoachAgent import analyze_convo_with_gpt4
 from MLtools.AbbrievedAgent import shortfeedback_with_gpt4
 from MLtools.TextToSpeech import openai_tts
 
+from MLtools.diarator import diarize
+from MLtools.AnnotateAgent import annotatewithgpt
 
 
 
@@ -36,6 +38,19 @@ class ConvoCoach():
         self.feedback_queue = []
         self.feedlog = {}
 
+    def get_highlights(self):
+        inorderlog = sorted(self.feedlog.items())
+        print(inorderlog)
+
+        outs = {}
+
+        for i, log in enumerate(inorderlog):
+            outs[f"Button {i + 1}: "] = log[1][-2]
+
+        return outs
+
+
+
     def add_pic(self, b64_img, timestamp):
         self.pics[self.ci%self.max_pics] = b64_img
         self.ci += 1
@@ -50,18 +65,18 @@ class ConvoCoach():
         if negative_facial_score > thres:
             aud_tuple  = self.clips[(self.pi - 1)%self.max_mem]
             if aud_tuple and timestamp - aud_tuple[1] < 40:
-                self.coach(aud_tuple[0], fer)
+                self.coach(aud_tuple[0], fer, aud_tuple[2])
 
             self.awaiting_audio = fer
 
         return ",".join([f'{emote}: {perc}' for emote, perc in fer.items()])
     
-    def add_clip(self, audio, timestamp):
-        self.clips[self.ci%self.max_mem] = (audio, timestamp)
+    def add_clip(self, audio, timestamp, filepath):
+        self.clips[self.ci%self.max_mem] = (audio, timestamp, filepath)
         self.ci += 1
 
         if self.awaiting_audio:
-            self.coach(audio, self.awaiting_audio, timestamp)
+            self.coach(audio, self.awaiting_audio, filepath, timestamp)
             # self.awaiting_audio = 0
 
         outs = []
@@ -88,7 +103,7 @@ class ConvoCoach():
         return analyze_convo_with_gpt4(transcript, 
                                        {'sad': 0.7006961703300476, 'fear': 0.13252848386764526, 'angry': 0.059667401015758514, 'happy': 0.04419358819723129, 'neutral': 0.04110799729824066})
     
-    def coach(self, audio, fer, timestamp=0):
+    def coach(self, audio, fer, filepath, timestamp=0):
 
         timestamp = timestamp if timestamp else time.time()
 
@@ -97,10 +112,16 @@ class ConvoCoach():
         # sentiment_0 = sentiment_analysis(speakers_clips[0])
         # sentiment_1 = sentiment_analysis(speakers_clips[1])
 
-        transcript = speech_query(data=audio)
+        # transcript = speech_query(data=audio)
         # sentiment = sentiment_analysis(data=audio)
 
+        transcript, qerr = speech_query(data=audio)
 
+        
+        if qerr:
+            return f"API error{transcript['error']}"
+
+        transcript = transcript['transcript']
         print(f'\n\n Transcript: {transcript}  \n\n')
 
         feedback = analyze_convo_with_gpt4(transcript, fer)
@@ -110,17 +131,29 @@ class ConvoCoach():
 
         aud_path, _ = openai_tts(short, timestamp)
 
+        diarized = diarize(filepath)
+        print(diarized)
+
+        if diarized:
+            rdiz = self.clean_anno(diarized, feedback)
+            sdiarized = [x.split(': ') for x in rdiz]
+
+        else:
+            print("DIARIZATION FAILURE")
+            sdiarized = []
+
         print(f'\n\n Short: {short}  \n\n')
 
-        self.feedback_queue.append((0, short, feedback, aud_path))
+        self.feedback_queue.append((timestamp, short, feedback, sdiarized, aud_path))
 
         print(f'\n\n AudPath: {aud_path}  \n\n')
 
         print("COACHING ACCOMPLISHED")
 
+    def clean_anno(self, diarized, feedback):
+        raws = annotatewithgpt("\n".join(diarized), feedback)
+        scr = lambda x: any([y in x for y in ['Person 0: ', 'Person 1: ', 'Speech Coach:']])
+        return list(filter(scr, raws.split('\n')))
 
 
 
-
-
-    
