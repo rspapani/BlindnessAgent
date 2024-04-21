@@ -61,7 +61,7 @@ class ConvoCoach():
             return f"API error{fer['error']}"
 
         negative_facial_score = sum((fer[emot] for emot in negative_expressions 
-                                     if emot in negative_expressions))
+                                     if emot in fer))
 
         if negative_facial_score > thres:
             aud_tuple  = self.clips[(self.pi - 1)%self.max_mem]
