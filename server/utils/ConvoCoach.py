@@ -9,7 +9,7 @@ from MLtools.SpeechToText import speech_query
 # from MLtools.TextToSpeech import tts
 # from MLtools.diarization import diarize_and_clip
 
-from MLtools.SpeechAgent import analyze_convo_with_gpt4
+from MLtools.CoachAgent import analyze_convo_with_gpt4
 
 
 
@@ -72,6 +72,9 @@ class ConvoCoach():
 
         transcript = speech_query(data=audio)
         sentiment = sentiment_analysis(data=audio)
+
+
+        print(f'\n\n Transcript: {transcript} \n\n  Sentiment: {sentiment} \n\n')
 
         self.feedback_queue.append(
             analyze_convo_with_gpt4(transcript, fer, sentiment, sentiment)

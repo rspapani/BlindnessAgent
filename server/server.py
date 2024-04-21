@@ -21,6 +21,7 @@ def upload_image():
         # return jsonify({'message': 'Image uploaded successfully'}), 200
 
         fers = machine.add_pic(image_base64, timestamp)
+        print(f'\n\n fer: {fers} \n\n')
         return jsonify({'message': f'Image analyzed {fers}'}), 200
 
     else:
@@ -39,6 +40,7 @@ def upload_audio():
         # return jsonify({'audio_link': audio_url}), 200
 
         feedback = machine.add_pic(audio_url, timestamp)
+        print(f'\n\n fer: {feedback} \n\n')
         return jsonify({'message': f'Audio analyzed {feedback}'}), 200
     else:
         return jsonify({'error': 'No audio_url field in the request body'}), 400
