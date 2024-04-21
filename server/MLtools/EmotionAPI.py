@@ -1,4 +1,4 @@
-from HuggingWrapper import get_query
+from MLtools.HuggingWrapper import get_query
 
 API_URL = "https://api-inference.huggingface.co/models/dima806/facial_emotions_image_detection"
 
