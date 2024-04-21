@@ -52,7 +52,7 @@ def upload_audio():
         with open(fname, "rb") as audio_file:
             audio_data = audio_file.read()
 
-        deedback = machine.add_clip(audio_data, 0, fname)
+        deedback = machine.add_clip(audio_data, time.time(), fname)
 
         print(deedback)
 
