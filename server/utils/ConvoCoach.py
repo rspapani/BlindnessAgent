@@ -34,7 +34,7 @@ class ConvoCoach():
 
         self.awaiting_audio = {'sad': 0.7006961703300476, 'fear': 0.13252848386764526, 'angry': 0.059667401015758514, 'happy': 0.04419358819723129, 'neutral': 0.04110799729824066}
         self.feedback_queue = []
-        self.feedlog = []
+        self.feedlog = {}
 
     def add_pic(self, b64_img, timestamp):
         self.pics[self.ci%self.max_pics] = b64_img
@@ -67,8 +67,8 @@ class ConvoCoach():
         outs = []
         while self.feedback_queue:
             x = self.feedback_queue.pop()
-                        
-            self.feedlog.append(x)
+
+            self.feedlog[x[0]] = x[1:]
             outs.append(x[-1])
 
         return outs
