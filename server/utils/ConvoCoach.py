@@ -119,7 +119,7 @@ class ConvoCoach():
         transcript, qerr = speech_query(data=audio)
 
         
-        if qerr and 'transcript' in transcript:
+        if qerr or not 'transcript' in transcript:
             return f"API error{transcript['error']}"
 
         transcript = transcript['transcript']
