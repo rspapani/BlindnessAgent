@@ -36,7 +36,7 @@ class ConvoCoach():
         self.pics[self.ci%self.max_pics] = b64_img
         self.ci += 1
 
-        fer = fer_query(data=base64.decode(b64_img))
+        fer = fer_query(data=base64.b64decode(b64_img))
 
         negative_facial_score = sum((fer[emot] for emot in negative_expressions))
 

