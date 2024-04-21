@@ -34,7 +34,7 @@ class ConvoCoach():
         self.pics = [0]*self.max_pics
         self.pi = 0
 
-        self.awaiting_audio = {'sad': 0.7006961703300476, 'fear': 0.13252848386764526, 'angry': 0.059667401015758514, 'happy': 0.04419358819723129, 'neutral': 0.04110799729824066}
+        self.awaiting_audio = 0 #{'sad': 0.7006961703300476, 'fear': 0.13252848386764526, 'angry': 0.059667401015758514, 'happy': 0.04419358819723129, 'neutral': 0.04110799729824066}
         self.feedback_queue = []
         self.feedlog = {}
 
