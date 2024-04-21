@@ -14,7 +14,7 @@ from MLtools.CoachAgent import analyze_convo_with_gpt4
 from MLtools.AbbrievedAgent import shortfeedback_with_gpt4
 from MLtools.TextToSpeech import openai_tts
 
-# from MLtools.diarator import diarize
+from MLtools.diarator import diarize
 from MLtools.AnnotateAgent import annotatewithgpt
 
 
@@ -133,7 +133,7 @@ class ConvoCoach():
 
             aud_path, _ = openai_tts(short, timestamp)
 
-            diarized = []# diarize(filepath)
+            diarized = diarize(filepath)
             print(diarized)
 
             if diarized:
