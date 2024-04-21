@@ -60,7 +60,8 @@ class ConvoCoach():
         if qerr:
             return f"API error{fer['error']}"
 
-        negative_facial_score = sum((fer[emot] for emot in negative_expressions))
+        negative_facial_score = sum((fer[emot] for emot in negative_expressions 
+                                     if emot in negative_expressions))
 
         if negative_facial_score > thres:
             aud_tuple  = self.clips[(self.pi - 1)%self.max_mem]
@@ -118,7 +119,7 @@ class ConvoCoach():
         transcript, qerr = speech_query(data=audio)
 
         
-        if qerr:
+        if qerr and 'transcript' in transcript:
             return f"API error{transcript['error']}"
 
         transcript = transcript['transcript']
