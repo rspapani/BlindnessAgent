@@ -14,7 +14,7 @@ from MLtools.CoachAgent import analyze_convo_with_gpt4
 from MLtools.AbbrievedAgent import shortfeedback_with_gpt4
 from MLtools.TextToSpeech import openai_tts
 
-from MLtools.diarator import diarize
+# from MLtools.diarator import diarize
 from MLtools.AnnotateAgent import annotatewithgpt
 
 
@@ -127,28 +127,32 @@ class ConvoCoach():
         feedback = analyze_convo_with_gpt4(transcript, fer)
         short = shortfeedback_with_gpt4(transcript, feedback)
 
-        print(f'\n\n Feedback: {feedback}  \n\n')
+        if not ("NO FEEDBACK" in feedback or "NO FEEDBACK" in short):
 
-        aud_path, _ = openai_tts(short, timestamp)
+            print(f'\n\n Feedback: {feedback}  \n\n')
 
-        diarized = diarize(filepath)
-        print(diarized)
+            aud_path, _ = openai_tts(short, timestamp)
 
-        if diarized:
-            rdiz = self.clean_anno(diarized, feedback)
-            sdiarized = [x.split(': ') for x in rdiz]
+            diarized = []# diarize(filepath)
+            print(diarized)
 
-        else:
-            print("DIARIZATION FAILURE")
-            sdiarized = []
+            if diarized:
+                rdiz = self.clean_anno(diarized, feedback)
+                sdiarized = [x.split(': ') for x in rdiz]
 
-        print(f'\n\n Short: {short}  \n\n')
+            else:
+                print("DIARIZATION FAILURE")
+                sdiarized = []
 
-        self.feedback_queue.append((timestamp, short, feedback, sdiarized, aud_path))
+            print(f'\n\n Short: {short}  \n\n')
 
-        print(f'\n\n AudPath: {aud_path}  \n\n')
+            self.feedback_queue.append((timestamp, short, feedback, sdiarized, aud_path))
 
-        print("COACHING ACCOMPLISHED")
+            print(f'\n\n AudPath: {aud_path}  \n\n')
+
+            print("COACHING ACCOMPLISHED")
+        
+        print("NO FEEDBACK")
 
     def clean_anno(self, diarized, feedback):
         raws = annotatewithgpt("\n".join(diarized), feedback)

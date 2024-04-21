@@ -28,7 +28,9 @@ def analyze_convo_with_gpt4(transcript, fer):
                 Provided here is the facial emotion recognition of the person I am speaking with: {fer}
             
                 Here is a transcript of the last 30 seconds of conversation:
-                {transcript}"""
+                {transcript}
+
+                However, if the transcript does not have significant evidence that it was a verbal comment that may have cause this, just reply saying NO FEEDBACK.  I.e. the expression detection may have failed.  Do not trust the facial emotion recognition if there is nothing out of the ordinary with the transcript."""
                 }
             ]
             }

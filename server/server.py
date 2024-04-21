@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from flask import send_from_directory, abort
+import time
 
 from flask_cors import CORS
 import re
@@ -34,7 +35,7 @@ def upload_image():
         
 @app.route('/upload_audio', methods=['POST'])
 def upload_audio():
-
+    print("WE JUST GOT SOMETHING")
     
     if 'file' not in request.files:
         return jsonify({"error": "No file part"}), 400
@@ -44,16 +45,18 @@ def upload_audio():
         return jsonify({"error": "No selected file"}), 400
     
     if file:
-        file.save("tempnew.webm")
+        print("It's the real DEAL!")
+        fname = f"temp_{time.time()}.webm"
+        file.save(fname)
 
-        with open("tempnew.webm", "rb") as audio_file:
+        with open(fname, "rb") as audio_file:
             audio_data = audio_file.read()
 
-        deedback = machine.add_clip(audio_data, 0, "tempnew.webm")
+        deedback = machine.add_clip(audio_data, 0, fname)
 
         print(deedback)
 
-        return jsonify({f"feedback_path": f"{deedback}"}), 200
+        return jsonify({"feedback_path": deedback}), 200
         # return send_from_directory(FILE_DIRECTORY, deedback, as_attachment=True)
     
     return jsonify({"error": "File type not allowed"}), 400
