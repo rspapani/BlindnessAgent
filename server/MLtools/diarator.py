@@ -331,12 +331,16 @@ def diarize(locfile):
         return input_string
 
     fulltranscripttxt="\n".join(fulltranscript[0:-1])
-    with open("transcript.txt","w") as f:
-        f.write(fulltranscripttxt)
+    # with open("transcript.txt","w") as f:
+        # f.write(fulltranscripttxt)
+
     for ispeaker in allspeakers:
         makeuberfiles(ispeaker)
     endperson=(substring_up_to_terminator(fulltranscript[-1],":").replace("Person ",""))
     trimendaudiofile(f"{output_folder}/TempTotalFileSpeaker_" + str(endperson)+".wav", f"{output_folder}/TotalFileSpeaker_" + str(endperson)+".wav")
     os.replace(f"{output_folder}/TempTotalFileSpeaker_" + str(endperson)+".wav", f"{output_folder}/TotalFileSpeaker_" + str(endperson)+".wav")
+
+    return fulltranscript[0:-1]
+
 if __name__ == "__main__":
-    diarize("../refaudio/Knocks.mp3")
+    print(diarize("restarded.mp3"))
