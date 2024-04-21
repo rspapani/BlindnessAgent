@@ -33,7 +33,7 @@ def sentiment_analysis(data="", filename=""):
 
         print(os.listdir("./MLtools/"))
 
-        raw_wav, _ = librosa.load("./MLtools/temp_sentiment.mp3", sr=model.config.sampling_rate)
+        raw_wav, _ = librosa.load("./restarded.mp3", sr=model.config.sampling_rate)
 
     else:
         raw_wav, _ = librosa.load(filename, sr=model.config.sampling_rate)
@@ -58,6 +58,6 @@ if __name__ == "__main__":
 
     x = time.time()
     print(os.listdir())
-    print(sentiment_analysis(filename="temp.mp3"))
+    print(sentiment_analysis(filename="restarted.mp3"))
     print(time.time() - x)
 
