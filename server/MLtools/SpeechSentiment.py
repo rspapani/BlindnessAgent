@@ -2,7 +2,7 @@ from transformers import AutoModelForAudioClassification
 import librosa, torch
 import time
 
-import io
+import os
 import soundfile as sf
 import numpy as np
 
@@ -28,10 +28,12 @@ def sentiment_analysis(data="", filename=""):
         #     raw_wav = audio_data
 
         #FML IT WORKS BETTER
-        with open("temp.flac", "wb") as f:
+        with open("./MLtools/temp_sentiment.mp3", "wb") as f:
             f.write(data)
 
-        raw_wav, _ = librosa.load("temp.flac", sr=model.config.sampling_rate)
+        print(os.listdir("./MLtools/"))
+
+        raw_wav, _ = librosa.load("./MLtools/temp_sentiment.mp3", sr=model.config.sampling_rate)
 
     else:
         raw_wav, _ = librosa.load(filename, sr=model.config.sampling_rate)
@@ -55,6 +57,7 @@ def sentiment_analysis(data="", filename=""):
 if __name__ == "__main__":
 
     x = time.time()
-    print(sentiment_analysis(filename="../refaudio/Knocks.mp3"))
+    print(os.listdir())
+    print(sentiment_analysis(filename="temp.mp3"))
     print(time.time() - x)
 

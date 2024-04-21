@@ -21,6 +21,10 @@ def get_query(API_URL, cust_headers={}, transform=lambda x: x):
                 data = f.read()
 
         response = requests.post(API_URL, headers=headers, data=data)
-        return transform(response.json())
+
+        if 'error' in response.json():
+            return response.json(), 1
+        else:
+            return transform(response.json()), 0
     
     return query

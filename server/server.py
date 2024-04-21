@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import re
+import os
 
 from utils.ConvoCoach import ConvoCoach
 
@@ -15,10 +16,6 @@ def upload_image():
     if 'image_base64' in data:
         image_base64 = data['image_base64']
         timestamp = int(data['timestamp'])
-        image_base64 = re.search(r'base64,(.*)', image_base64).group(1)
-        image_encodings.append(image_base64)
-        print(timestamp)
-        # return jsonify({'message': 'Image uploaded successfully'}), 200
 
         fers = machine.add_pic(image_base64, timestamp)
         print(f'\n\n fer: {fers} \n\n')
@@ -30,22 +27,29 @@ def upload_image():
         
 @app.route('/upload_audio', methods=['POST'])
 def upload_audio():
-    data = request.get_json()
-    if 'audio_url' in data:
-        audio_url = data['audio_url']
-        print(audio_url)
-        print(data)
-        timestamp = int(data['timestamp'])
-        # Assuming the data format is a URL pointing to the audio file
-        # You might want to perform additional validation on the URL
-        # return jsonify({'audio_link': audio_url}), 200
 
-        feedback = machine.add_pic(audio_url, timestamp)
-        print(f'\n\n fer: {feedback} \n\n')
-        return jsonify({'message': f'Audio analyzed {feedback}'}), 200
-    else:
-        return jsonify({'error': 'No audio_url field in the request body'}), 400
     
+    if 'file' not in request.files:
+        return jsonify({"error": "No file part"}), 400
+    
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"error": "No selected file"}), 400
+    
+    if file:
+        file.save("tempnew.webm")
+
+        with open("tempnew.webm", "rb") as audio_file:
+            audio_data = audio_file.read()
+
+        print("success")
+        # feedback = machine.add_clipd(audio_data, 0)
+        # print(feedback)
+
+        return jsonify({"message": "File successfully uploaded"}), 200
+    
+    return jsonify({"error": "File type not allowed"}), 400
+
 
 @app.route('/dummy_endpoint', methods=['GET'])
 def dummy_endpoint():

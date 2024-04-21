@@ -36,7 +36,10 @@ class ConvoCoach():
         self.pics[self.ci%self.max_pics] = b64_img
         self.ci += 1
 
-        fer = fer_query(data=base64.b64decode(b64_img))
+        fer, qerr = fer_query(data=base64.b64decode(b64_img[21:]))
+
+        if qerr:
+            return f"API error{fer['error']}"
 
         negative_facial_score = sum((fer[emot] for emot in negative_expressions))
 
@@ -62,6 +65,24 @@ class ConvoCoach():
             outs.append(id(self.feedback_queue.pop()))
 
         return outs
+    
+    def add_clipd(self, audio, timestamp):
+        self.clips[self.ci%self.max_mem] = (audio, timestamp)
+        self.ci += 1
+
+        transcript, qerr = speech_query(data=audio)
+
+        
+        if qerr:
+            return f"API error{transcript['error']}"
+        
+        print(transcript)
+        
+        sentiment = sentiment_analysis(data=audio)
+
+        print(sentiment)
+
+        return transcript
     
     def coach(self, audio, fer):
 
