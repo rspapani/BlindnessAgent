@@ -11,9 +11,10 @@ def upload_image():
     data = request.get_json()
     if 'image_base64' in data:
         image_base64 = data['image_base64']
+        timestamp = data['timestamp']
         image_base64 = re.search(r'base64,(.*)', image_base64).group(1)
         image_encodings.append(image_base64)
-        print(image_encodings)
+        print(timestamp)
         return jsonify({'message': 'Image uploaded successfully'}), 200
     else:
         return jsonify({'error': 'No image_base64 field in the request body'}), 400
@@ -24,6 +25,7 @@ def upload_audio():
     data = request.get_json()
     if 'audio_url' in data:
         audio_url = data['audio_url']
+        timestamp = data['timetamp']
         # Assuming the data format is a URL pointing to the audio file
         # You might want to perform additional validation on the URL
         return jsonify({'audio_link': audio_url}), 200
