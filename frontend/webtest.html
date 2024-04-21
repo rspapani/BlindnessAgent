@@ -162,9 +162,12 @@ setInterval(function() {
   if (square.style.backgroundColor === 'red') {
     if (!recordingInterval) {
       startRecordingInterval();
+      startImageCaptureInterval();
+      
     }
   } else {
     clearInterval(recordingInterval); // Stop recording interval if square becomes blue
+    clearInterval(imageCaptureInterval);
     recordingInterval = null;
   }
 }, 1000);
@@ -258,25 +261,27 @@ function sendImage(dataURL) {
     console.error('Error:', error);
   });
 }
-setInterval(function() {
-  var video = document.getElementById('videoElement');
-  var canvas = document.getElementById('canvas');
-  var context = canvas.getContext('2d');
+function startImageCaptureInterval() {
+  imageCaptureInterval = setInterval(function() {
+    var video = document.getElementById('videoElement');
+    var canvas = document.getElementById('canvas');
+    var context = canvas.getContext('2d');
 
-  // Set canvas dimensions to match video dimensions
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
+    // Set canvas dimensions to match video dimensions
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
 
-  // Draw the current frame from the video onto the canvas
-  context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    // Draw the current frame from the video onto the canvas
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-  // Convert the canvas content to a data URL representing a PNG image
-  var dataURL = canvas.toDataURL('image/png');
-  console.log(dataURL)
+    // Convert the canvas content to a data URL representing a PNG image
+    var dataURL = canvas.toDataURL('image/png');
+    console.log(dataURL)
 
-  // Send POST request to image endpoint
-  sendImage(dataURL);
-}, 5000); // Repeat every 5 seconds
+    // Send POST request to image endpoint
+    sendImage(dataURL);
+  }, 5000);
+}
 
 
 </script>
