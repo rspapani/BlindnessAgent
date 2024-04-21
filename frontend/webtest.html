@@ -54,23 +54,7 @@
       // Append the download link to the DOM
         const downloadLinks = document.getElementById('downloadLinks');
         downloadLinks.appendChild(mp3Link);
-        fetch('http://localhost:5000/upload_audio', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({ audio_url: audioURL }),
-})
-  .then(response => {
-    if (response.ok) {
-      console.log('Audio uploaded successfully');
-    } else {
-      console.error('Failed to upload image');
-    }
-  })
-  .catch(error => {
-    console.error('Error:', error);
-  });
+        
         
       };
     })
